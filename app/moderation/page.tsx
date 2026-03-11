@@ -7,6 +7,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import Link from "next/link";
 import { Loader2, Check, X, BookOpen, AlertCircle, Inbox, ExternalLink, ShieldAlert, Edit3, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useI18n, getCategoryTranslation } from "@/contexts/I18nContext";
 
 interface PendingBook {
   id: string;
@@ -48,6 +49,8 @@ export default function ModerationPage() {
   
   // Usar record para saber qué libro o edición está procesándose (para el loader del botón)
   const [processingId, setProcessingId] = useState<string | null>(null);
+  
+  const { t } = useI18n();
 
   // States for the Preview Modal
   const [previewItem, setPreviewItem] = useState<PendingBook | ProposedEdit | null>(null);
@@ -73,7 +76,7 @@ export default function ModerationPage() {
       setBooks(loadedBooks);
     } catch (err: any) {
       console.error("Error fetching pending books:", err);
-      setError("No se pudieron cargar las obras pendientes.");
+      setError(t("moderation.errorBooks"));
     }
   };
 
@@ -90,7 +93,7 @@ export default function ModerationPage() {
       setEdits(loadedEdits);
     } catch (err: any) {
       console.error("Error fetching pending edits:", err);
-      setError("No se pudieron cargar las ediciones propuestas.");
+      setError(t("moderation.errorEdits"));
     }
   };
 
@@ -144,21 +147,21 @@ export default function ModerationPage() {
       setBooks((prev) => prev.filter((b) => b.id !== book.id));
     } catch (err) {
       console.error("Error approving book:", err);
-      alert("Hubo un error al aprobar la obra.");
+      alert(t("moderation.errorApproveBook"));
     } finally {
       setProcessingId(null);
     }
   };
 
   const handleRejectBook = async (bookId: string) => {
-    if (!window.confirm("¿Estás seguro de que deseas rechazar y eliminar esta obra?")) return;
+    if (!window.confirm(t("moderation.rejectBookConfirm"))) return;
     try {
       setProcessingId(bookId);
       await deleteDoc(doc(db, "pending_books", bookId));
       setBooks((prev) => prev.filter((b) => b.id !== bookId));
     } catch (err) {
       console.error("Error rejecting book:", err);
-      alert("Hubo un error al rechazar la obra.");
+      alert(t("moderation.errorRejectBook"));
     } finally {
       setProcessingId(null);
     }
@@ -193,14 +196,14 @@ export default function ModerationPage() {
       setEdits((prev) => prev.filter((e) => e.id !== edit.id));
     } catch (err) {
       console.error("Error approving edit:", err);
-      alert("Hubo un error al aprobar la edición.");
+      alert(t("moderation.errorApproveEdit"));
     } finally {
       setProcessingId(null);
     }
   };
 
   const handleRejectEdit = async (editId: string) => {
-    if (!window.confirm("¿Estás seguro de que deseas rechazar esta edición?")) return;
+    if (!window.confirm(t("moderation.rejectEditConfirm"))) return;
     try {
       setProcessingId(editId);
       await updateDoc(doc(db, "edits", editId), {
@@ -210,7 +213,7 @@ export default function ModerationPage() {
       setEdits((prev) => prev.filter((e) => e.id !== editId));
     } catch (err) {
       console.error("Error rejecting edit:", err);
-      alert("Hubo un error al rechazar la edición.");
+      alert(t("moderation.errorRejectEdit"));
     } finally {
       setProcessingId(null);
     }
@@ -223,22 +226,22 @@ export default function ModerationPage() {
         {isCheckingAuth ? (
           <div className="py-32 flex flex-col items-center justify-center text-muted">
             <Loader2 className="w-10 h-10 animate-spin text-primary mb-6" />
-            <p className="text-sm font-black uppercase tracking-[0.2em]">Verificando Credenciales del Archivo...</p>
+            <p className="text-sm font-black uppercase tracking-[0.2em]">{t("moderation.verifying")}</p>
           </div>
         ) : !isModerator ? (
           <div className="py-32 flex flex-col items-center justify-center text-center">
             <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mb-8 border border-red-500/20">
               <ShieldAlert className="w-10 h-10 text-red-500" />
             </div>
-            <h2 className="text-3xl font-serif font-bold text-white mb-4">Acceso Denegado</h2>
+            <h2 className="text-3xl font-serif font-bold text-white mb-4">{t("moderation.restricted")}</h2>
             <p className="text-muted max-w-md mx-auto mb-8 line-height-loose">
-              El panel de moderación está estrictamente reservado para los curadores designados del archivo. Asegúrate de haber iniciado sesión con una cuenta autorizada.
+              {t("moderation.restrictedDesc")}
             </p>
             <Link 
               href="/login"
               className="px-8 py-3 bg-white text-black text-xs font-black uppercase tracking-widest rounded-full hover:bg-primary hover:text-white transition-all shadow-editorial"
             >
-              Identificarse
+              {t("moderation.loginButton")}
             </Link>
           </div>
         ) : (
@@ -246,15 +249,15 @@ export default function ModerationPage() {
             {/* Header */}
             <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-[10px] font-black uppercase tracking-[0.3em] mb-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full text-primary text-[10px] font-black uppercase tracking-[0.3em]">
                   <BookOpen size={12} />
-                  Curador Ejecutivo
+                  {t("moderation.headerTag")}
                 </div>
                 <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">
-                  Panel de <span className="text-primary italic font-light">Moderación</span>
+                  {t("moderation.title")} <span className="text-primary italic font-light">{t("moderation.titleHighlight")}</span>
                 </h1>
                 <p className="mt-4 text-muted font-light max-w-xl">
-                  Supervisa la integridad literaria de Aethel. Aprueba nuevos manuscritos o revisa colaboraciones de la comunidad.
+                  {t("moderation.subtitle")}
                 </p>
               </div>
               
@@ -263,7 +266,7 @@ export default function ModerationPage() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
                 </span>
-                {books.length + edits.length} elementos pendientes
+                {t("moderation.pendingElements").replace("{count}", (books.length + edits.length).toString())}
               </div>
             </div>
 
@@ -282,14 +285,14 @@ export default function ModerationPage() {
                 className={`flex items-center gap-2 text-xs font-black uppercase tracking-widest px-6 py-3 rounded-full transition-all whitespace-nowrap ${activeTab === 'books' ? 'bg-primary text-white shadow-lg' : 'bg-surface border border-border text-muted hover:text-white hover:bg-white/5'}`}
               >
                 <BookOpen size={16} />
-                Nuevos Manuscritos {books.length > 0 && `(${books.length})`}
+                {t("moderation.tabBooks")} {books.length > 0 && `(${books.length})`}
               </button>
               <button 
                 onClick={() => setActiveTab('edits')}
                 className={`flex items-center gap-2 text-xs font-black uppercase tracking-widest px-6 py-3 rounded-full transition-all whitespace-nowrap ${activeTab === 'edits' ? 'bg-primary text-white shadow-lg' : 'bg-surface border border-border text-muted hover:text-white hover:bg-white/5'}`}
               >
                 <Edit3 size={16} />
-                Ediciones Propuestas {edits.length > 0 && `(${edits.length})`}
+                {t("moderation.tabEdits")} {edits.length > 0 && `(${edits.length})`}
               </button>
             </div>
 
@@ -297,7 +300,7 @@ export default function ModerationPage() {
             {isLoading ? (
               <div className="py-24 flex flex-col items-center justify-center text-muted">
                 <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
-                <p className="text-sm font-black uppercase tracking-[0.2em]">Sincronizando Archivos...</p>
+                <p className="text-sm font-black uppercase tracking-[0.2em]">{t("moderation.syncing")}</p>
               </div>
             ) : activeTab === 'books' ? (
               // TAB: NUEVOS LIBROS
@@ -306,9 +309,9 @@ export default function ModerationPage() {
                   <div className="w-20 h-20 bg-background rounded-full flex items-center justify-center mx-auto mb-6 border border-border">
                     <Inbox className="w-8 h-8 text-muted" />
                   </div>
-                  <h3 className="text-2xl font-serif font-semibold mb-2">Bandeja Vacía</h3>
+                  <h3 className="text-2xl font-serif font-semibold mb-2">{t("moderation.emptyBooksTitle")}</h3>
                   <p className="text-muted max-w-md mx-auto">
-                    No hay nuevas obras esperando revisión en este momento.
+                    {t("moderation.emptyBooksDesc")}
                   </p>
                 </div>
               ) : (
@@ -327,7 +330,7 @@ export default function ModerationPage() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-black/30" />
                         <div className="absolute top-4 left-4 lg:hidden">
                           <span className="px-3 py-1 bg-black/50 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-wider border border-white/10 text-white">
-                            {book.category}
+                            {getCategoryTranslation(book.category, t)}
                           </span>
                         </div>
                       </div>
@@ -336,15 +339,15 @@ export default function ModerationPage() {
                         <div className="flex justify-between items-start mb-4">
                           <div>
                             <span className="hidden lg:inline-block px-3 py-1 bg-primary/10 rounded-full text-[10px] font-black uppercase tracking-wider text-primary border border-primary/20 mb-3">
-                              {book.category}
+                              {getCategoryTranslation(book.category, t)}
                             </span>
                             <h3 className="text-2xl md:text-3xl font-serif font-bold group-hover:text-primary transition-colors">
                               {book.title}
                             </h3>
                             <div className="text-xs text-muted mt-2 flex items-center gap-2">
-                              <span>Nuevo Manuscrito</span>
+                              <span>{t("moderation.bookPreTitle")}</span>
                               <span>•</span>
-                              <span>ID: {book.id}</span>
+                              <span>{t("moderation.bookId").replace("{id}", book.id)}</span>
                             </div>
                           </div>
                         </div>
@@ -361,14 +364,14 @@ export default function ModerationPage() {
                             onClick={() => openPreview(book)}
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-primary/20 hover:bg-primary/10 hover:border-primary/50 transition-all font-black text-xs uppercase tracking-widest text-primary sm:mr-auto"
                           >
-                            <Maximize2 size={16} /> Leer Obra
+                            <Maximize2 size={16} /> {t("moderation.readBook")}
                           </button>
                           <button
                             onClick={() => handleRejectBook(book.id)}
                             disabled={processingId !== null}
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-border hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all font-black text-xs uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed text-muted"
                           >
-                            <X size={16} /> Rechazar
+                            <X size={16} /> {t("moderation.rejectBook")}
                           </button>
                           <button
                             onClick={() => handleApproveBook(book)}
@@ -376,9 +379,9 @@ export default function ModerationPage() {
                             className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-white text-black hover:bg-primary hover:text-white transition-all shadow-editorial font-black text-xs uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed group/btn"
                           >
                             {processingId === book.id ? (
-                              <><Loader2 className="w-4 h-4 animate-spin" /> Procesando</>
+                              <><Loader2 className="w-4 h-4 animate-spin" /> {t("moderation.processing")}</>
                             ) : (
-                              <><Check size={16} /> Aprobar Obra</>
+                              <><Check size={16} /> {t("moderation.approveBook")}</>
                             )}
                           </button>
                         </div>
@@ -394,9 +397,9 @@ export default function ModerationPage() {
                   <div className="w-20 h-20 bg-background rounded-full flex items-center justify-center mx-auto mb-6 border border-border">
                     <Inbox className="w-8 h-8 text-muted" />
                   </div>
-                  <h3 className="text-2xl font-serif font-semibold mb-2">Bandeja Vacía</h3>
+                  <h3 className="text-2xl font-serif font-semibold mb-2">{t("moderation.emptyEditsTitle")}</h3>
                   <p className="text-muted max-w-md mx-auto">
-                    No hay propuestas de edición pendientes por revisar o aprobar.
+                    {t("moderation.emptyEditsDesc")}
                   </p>
                 </div>
               ) : (
@@ -421,16 +424,16 @@ export default function ModerationPage() {
                         <div className="flex justify-between items-start mb-4">
                           <div>
                             <span className="hidden lg:inline-block px-3 py-1 bg-cyan-500/10 rounded-full text-[10px] font-black uppercase tracking-wider text-cyan-400 border border-cyan-500/20 mb-3">
-                              {edit.proposedCategory}
+                              {getCategoryTranslation(edit.proposedCategory, t)}
                             </span>
                             <h3 className="text-2xl font-serif font-bold group-hover:text-cyan-400 transition-colors">
                               {edit.proposedTitle}
                             </h3>
                             <div className="text-xs text-muted mt-2 flex items-center gap-2">
-                              <span>Propuesto por: <strong className="text-text">{edit.authorName}</strong></span>
+                              <span>{t("moderation.editPreTitle")}<strong className="text-text">{edit.authorName}</strong></span>
                               <span>•</span>
                               <Link href={`/book/${edit.bookId}`} target="_blank" className="flex items-center gap-1 hover:text-primary transition-colors">
-                                Ver Original <ExternalLink size={12}/>
+                                {t("moderation.viewOriginal")} <ExternalLink size={12}/>
                               </Link>
                             </div>
                           </div>
@@ -448,14 +451,14 @@ export default function ModerationPage() {
                             onClick={() => openPreview(edit)}
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-cyan-500/20 hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all font-black text-xs uppercase tracking-widest text-cyan-400 sm:mr-auto"
                           >
-                            <Maximize2 size={16} /> Inspeccionar
+                            <Maximize2 size={16} /> {t("moderation.inspectEdit")}
                           </button>
                           <button
                             onClick={() => handleRejectEdit(edit.id)}
                             disabled={processingId !== null}
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-border hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all font-black text-xs uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed text-muted"
                           >
-                            <X size={16} /> Rechazar
+                            <X size={16} /> {t("moderation.rejectEdit")}
                           </button>
                           <button
                             onClick={() => handleApproveEdit(edit)}
@@ -463,9 +466,9 @@ export default function ModerationPage() {
                             className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-cyan-500 text-black hover:bg-cyan-400 transition-all shadow-editorial font-black text-xs uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {processingId === edit.id ? (
-                              <><Loader2 className="w-4 h-4 animate-spin" /> Procesando</>
+                              <><Loader2 className="w-4 h-4 animate-spin" /> {t("moderation.processing")}</>
                             ) : (
-                              <><Check size={16} /> Aplicar Cambios</>
+                              <><Check size={16} /> {t("moderation.approveEdit")}</>
                             )}
                           </button>
                         </div>
@@ -508,6 +511,8 @@ export default function ModerationPage() {
 
 // Sub-componente para limpiar la estructura del Modal
 function PreviewModal({ item, currentPage, setPage, onClose, onApprove, onReject, processingId }: any) {
+  const { t } = useI18n();
+
   const isEdit = 'proposedTitle' in item;
   const title = isEdit ? item.proposedTitle : item.title;
   const author = isEdit ? item.authorName : (item.authorName || 'Usuario Anónimo');
@@ -541,7 +546,7 @@ function PreviewModal({ item, currentPage, setPage, onClose, onApprove, onReject
         <div className="px-6 py-4 border-b border-border/50 bg-surface/50 flex justify-between items-center z-10">
           <div className="flex flex-col">
             <span className={`text-[10px] font-black uppercase tracking-[0.3em] ${themeColor} mb-1`}>
-              {isEdit ? 'Inspección de Edición' : 'Lectura de Manuscrito'}
+              {isEdit ? t("moderation.modalEditTag") : t("moderation.modalBookTag")}
             </span>
             <h3 className="text-xl font-serif font-bold text-white line-clamp-1">{title}</h3>
           </div>
@@ -560,7 +565,7 @@ function PreviewModal({ item, currentPage, setPage, onClose, onApprove, onReject
           <div className="max-w-3xl mx-auto mb-16 px-4">
              <div className="text-center mb-10">
                <span className="text-muted text-xs uppercase tracking-widest font-black block mb-4">
-                 Autoría: <span className="text-white">{author}</span>
+                 {t("moderation.authorLabel")} <span className="text-white">{author}</span>
                </span>
                {synopsis && (
                  <p className="text-lg md:text-xl font-serif font-light leading-relaxed text-neutral-300 italic">
@@ -603,7 +608,7 @@ function PreviewModal({ item, currentPage, setPage, onClose, onApprove, onReject
               <ChevronLeft size={20} />
             </button>
             <span className="font-serif text-sm tracking-widest text-muted">
-              Página <strong className="text-white">{currentPage + 1}</strong> de {arrContent.length}
+              {t("moderation.pageXofY").replace("{current}", (currentPage + 1).toString()).replace("{total}", arrContent.length.toString())}
             </span>
             <button 
               onClick={() => setPage(currentPage < arrContent.length - 1 ? currentPage + 1 : currentPage)}
@@ -620,7 +625,7 @@ function PreviewModal({ item, currentPage, setPage, onClose, onApprove, onReject
               disabled={processingId !== null}
               className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-border/50 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all font-black text-[10px] uppercase tracking-widest disabled:opacity-50 text-muted"
             >
-              <X size={14} /> Rechazar
+              <X size={14} /> {t("moderation.modalReject")}
             </button>
             <button
               onClick={onApprove}
@@ -628,9 +633,9 @@ function PreviewModal({ item, currentPage, setPage, onClose, onApprove, onReject
               className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 ${btnColor}`}
             >
               {processingId === item.id ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Procesando</>
+                <><Loader2 className="w-4 h-4 animate-spin" /> {t("moderation.processing")}</>
               ) : (
-                <><Check size={14} /> {isEdit ? 'Aprobar Edición' : 'Aprobar Obra'}</>
+                <><Check size={14} /> {isEdit ? t("moderation.modalApproveEdit") : t("moderation.modalApproveBook")}</>
               )}
             </button>
           </div>

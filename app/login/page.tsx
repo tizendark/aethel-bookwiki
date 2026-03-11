@@ -11,6 +11,7 @@ import {
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { Loader2, BookOpen, AlertCircle, Key, Mail, User } from "lucide-react";
+import { useI18n } from "@/contexts/I18nContext";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   
   const router = useRouter();
+  const { t } = useI18n();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,13 +56,13 @@ export default function LoginPage() {
     } catch (err: any) {
       console.error("Auth error:", err);
       if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
-        setError("Credenciales inválidas. Verifica tu correo y contraseña.");
+        setError(t("login.invalidCreds"));
       } else if (err.code === "auth/email-already-in-use") {
-        setError("Este correo ya está registrado.");
+        setError(t("login.emailInUse"));
       } else if (err.code === "auth/weak-password") {
-        setError("La contraseña debe tener al menos 6 caracteres.");
+        setError(t("login.weakPassword"));
       } else {
-        setError(err.message || "Ocurrió un error de autenticación.");
+        setError(err.message || t("login.authError"));
       }
     } finally {
       setIsLoading(false);
@@ -89,7 +91,7 @@ export default function LoginPage() {
       router.push("/");
     } catch (err: any) {
       console.error("Google Auth error:", err);
-      setError(err.message || "Ocurrió un error al iniciar sesión con Google.");
+      setError(err.message || t("login.googleError"));
     } finally {
       setIsLoading(false);
     }
@@ -104,15 +106,15 @@ export default function LoginPage() {
           </div>
         </div>
         <h2 className="text-center text-4xl font-serif font-bold tracking-tight">
-          {isLogin ? "Acceso al" : "Únete al"} <span className="text-primary italic font-light">Archivo</span>
+          {isLogin ? t("login.loginTitle") : t("login.joinTitle")} <span className="text-primary italic font-light">{t("login.titleHighlight")}</span>
         </h2>
         <p className="mt-3 text-center text-sm text-muted">
-          {isLogin ? "¿No tienes cuenta? " : "¿Ya eres miembro? "}
+          {isLogin ? t("login.noAccount") : t("login.hasAccount")}
           <button 
             onClick={() => setIsLogin(!isLogin)} 
             className="font-medium text-primary hover:text-primary/80 transition-colors uppercase tracking-widest text-[10px]"
           >
-            {isLogin ? "Regístrate aquí" : "Inicia Sesión"}
+            {isLogin ? t("login.registerHere") : t("login.loginHere")}
           </button>
         </p>
       </div>
@@ -125,7 +127,7 @@ export default function LoginPage() {
             {!isLogin && (
               <div>
                 <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-muted mb-2">
-                  Nombre Público
+                  {t("login.nameLabel")}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -137,7 +139,7 @@ export default function LoginPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="block w-full pl-12 pr-4 py-3 rounded-xl border border-border bg-background focus:ring-1 focus:ring-primary focus:border-primary transition-colors text-text placeholder-muted/50 outline-none"
-                    placeholder="Tu nombre de autor"
+                    placeholder={t("login.namePlaceholder")}
                   />
                 </div>
               </div>
@@ -145,7 +147,7 @@ export default function LoginPage() {
 
             <div>
               <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-muted mb-2">
-                Correo Electrónico
+                {t("login.emailLabel")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -164,7 +166,7 @@ export default function LoginPage() {
 
             <div>
               <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-muted mb-2">
-                Contraseña
+                {t("login.passwordLabel")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -196,10 +198,10 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Verificando...
+                  {t("login.verifying")}
                 </>
               ) : (
-                isLogin ? "Desbloquear Archivo" : "Forjar Credenciales"
+                isLogin ? t("login.unlockArchive") : t("login.forgeCreds")
               )}
             </button>
 
@@ -209,7 +211,7 @@ export default function LoginPage() {
               </div>
               <div className="relative flex justify-center text-xs">
                 <span className="bg-surface px-2 text-muted font-sans uppercase tracking-widest text-[9px] font-black">
-                  O puedes
+                  {t("login.orYouCan")}
                 </span>
               </div>
             </div>
@@ -223,7 +225,7 @@ export default function LoginPage() {
               <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
                 <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" fill="currentColor"/>
               </svg>
-              Continúa con Google
+              {t("login.continueGoogle")}
             </button>
           </form>
         </div>

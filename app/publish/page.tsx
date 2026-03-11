@@ -8,6 +8,7 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import Link from "next/link";
 import { Loader2, Send, Image as ImageIcon, BookOpen, AlertCircle, CheckCircle2, Plus, Trash2, Save, Info } from "lucide-react";
 import RichTextToolbar from "@/components/RichTextToolbar";
+import { useI18n } from "@/contexts/I18nContext";
 
 export default function PublishPage() {
   const [title, setTitle] = useState("");
@@ -25,6 +26,8 @@ export default function PublishPage() {
   
   const [user, setUser] = useState<User | null>(null);
   const [authChecking, setAuthChecking] = useState(true);
+
+  const { t } = useI18n();
 
   // Load draft from localStorage on mount
   useEffect(() => {
@@ -87,16 +90,16 @@ export default function PublishPage() {
     setSuccess(false);
 
     try {
-      if (!user) throw new Error("Debes haber iniciado sesión para publicar.");
+      if (!user) throw new Error(t("publish.restrictedDesc"));
       
       if (!title || !category || !synopsis || !coverFile || pages.some(p => !p.trim())) {
-        throw new Error("Por favor, completa todos los campos y asegúrate de que ninguna página esté vacía.");
+        throw new Error(t("common.error")); // generic error for validation
       }
 
       // 1. Upload cover image to Cloudinary
       const coverUrl = await uploadToCloudinary(coverFile);
       if (!coverUrl) {
-        throw new Error("Error al subir la imagen. Por favor, intenta de nuevo.");
+        throw new Error(t("common.error")); // generic error
       }
 
       // 2. Save document to Firestore in "pending_books" collection
@@ -133,13 +136,13 @@ export default function PublishPage() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-[10px] font-black uppercase tracking-[0.3em] mb-8">
             <BookOpen size={12} />
-            Submission
+            {t("publish.headerTag")}
           </div>
           <h1 className="text-4xl md:text-6xl font-serif font-bold tracking-tight mb-4">
-            Publicar <span className="text-primary italic font-light">Obra</span>
+            {t("publish.title")} <span className="text-primary italic font-light">{t("publish.titleHighlight")}</span>
           </h1>
           <p className="text-lg text-muted font-light max-w-xl mx-auto">
-            Comparte tu historia con el mundo. Tu libro será revisado antes de ser público en la galería.
+            {t("publish.subtitle")}
           </p>
         </div>
 
@@ -149,22 +152,22 @@ export default function PublishPage() {
           {authChecking ? (
             <div className="py-24 flex flex-col items-center justify-center text-muted">
               <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
-              <p className="text-sm font-black uppercase tracking-[0.2em]">Verificando Identidad...</p>
+              <p className="text-sm font-black uppercase tracking-[0.2em]">{t("publish.verifying")}</p>
             </div>
           ) : !user ? (
             <div className="text-center py-12">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-500/10 mb-8 border border-red-500/20">
                 <AlertCircle className="w-10 h-10 text-red-400" />
               </div>
-              <h2 className="text-3xl font-serif font-semibold mb-4 text-white">Acceso Restringido</h2>
+              <h2 className="text-3xl font-serif font-semibold mb-4 text-white">{t("publish.restricted")}</h2>
               <p className="text-muted leading-relaxed mb-10 max-w-sm mx-auto">
-                Debes tener unas credenciales válidas en la librería para poder enviar manuscritos a revisión.
+                {t("publish.restrictedDesc")}
               </p>
               <Link
                 href="/login"
                 className="inline-flex items-center justify-center px-8 py-4 border border-border text-xs font-black uppercase tracking-[0.2em] rounded-full text-text hover:bg-white hover:text-black transition-all duration-300 shadow-editorial"
               >
-                Identificarse
+                {t("publish.loginButton")}
               </Link>
             </div>
           ) : success ? (
@@ -172,22 +175,22 @@ export default function PublishPage() {
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-8 border border-primary/20">
                 <CheckCircle2 className="w-10 h-10 text-primary" />
               </div>
-              <h2 className="text-3xl font-serif font-semibold mb-4">¡Obra Inmortalizada!</h2>
+              <h2 className="text-3xl font-serif font-semibold mb-4">{t("publish.successTitle")}</h2>
               <p className="text-muted leading-relaxed mb-10 max-w-sm mx-auto">
-                Tu obra ha sido enviada exitosamente para revisión. Una vez aprobada, formará parte de nuestra creciente librería viva.
+                {t("publish.successDesc")}
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <button
                   onClick={() => setSuccess(false)}
                   className="inline-flex items-center justify-center px-8 py-4 border border-border text-xs font-black uppercase tracking-[0.2em] rounded-full text-text hover:bg-white hover:text-black transition-all duration-300 w-full sm:w-auto"
                 >
-                  Publicar otro tomo
+                  {t("publish.publishAnother")}
                 </button>
                 <Link
                   href="/library"
                   className="inline-flex items-center justify-center px-8 py-4 bg-white text-black hover:bg-primary hover:text-white text-xs font-black uppercase tracking-[0.2em] rounded-full transition-all duration-300 shadow-editorial w-full sm:w-auto"
                 >
-                  Ir al Archivo
+                  {t("publish.goToLibrary")}
                 </Link>
               </div>
             </div>
@@ -197,10 +200,10 @@ export default function PublishPage() {
               <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 flex items-start gap-3">
                 <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div className="flex flex-col">
-                  <h4 className="text-sm font-semibold text-white">Borradores Locales</h4>
+                  <h4 className="text-sm font-semibold text-white">{t("publish.draftWarningTitle")}</h4>
                   <p className="text-xs text-muted/80 mt-1 leading-relaxed">
-                    Si no terminas tu obra ahora, puedes guardarla como borrador. 
-                    <strong className="text-primary/80 font-normal"> Ten en cuenta que el borrador se guarda en la memoria de este navegador.</strong> Si cierras sesión o entras desde otro dispositivo (como tu celular), no verás tu progreso no guardado.
+                    {t("publish.draftWarningDesc")} 
+                    <strong className="text-primary/80 font-normal"> {t("publish.draftWarningHighlight")}</strong> {t("publish.draftWarningDesc2")}
                   </p>
                 </div>
               </div>
@@ -208,14 +211,14 @@ export default function PublishPage() {
               {/* Title Field */}
               <div className="space-y-3">
                 <label htmlFor="title" className="block text-[11px] font-black uppercase tracking-[0.2em] text-muted">
-                  Título de la Obra
+                  {t("publish.formTitleLabel")}
                 </label>
                 <input
                   type="text"
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Ej. La Caída de los Gigantes"
+                  placeholder={t("publish.formTitlePlaceholder")}
                   className="block w-full px-5 py-4 rounded-xl border border-border bg-background focus:ring-1 focus:ring-primary focus:border-primary transition-colors text-text placeholder-muted/50 font-serif text-lg outline-none"
                   disabled={isLoading}
                 />
@@ -224,24 +227,28 @@ export default function PublishPage() {
               {/* Category Field */}
               <div className="space-y-3">
                 <label htmlFor="category" className="block text-[11px] font-black uppercase tracking-[0.2em] text-muted">
-                  Categoría
+                  {t("publish.formCategoryLabel")}
                 </label>
                 <div className="relative">
                   <select
                     id="category"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="block w-full px-5 py-4 rounded-xl border border-border bg-background focus:ring-1 focus:ring-primary focus:border-primary transition-colors text-text appearance-none outline-none font-serif text-lg"
-                    disabled={isLoading}
+                    required
+                    className="w-full bg-background border border-border rounded-xl px-4 py-4 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer hover:border-white/20 transition-colors"
                   >
-                    <option value="" disabled className="text-muted/50">Selecciona un género...</option>
-                    <option value="Ficción">Ficción</option>
-                    <option value="Fantasía">Fantasía Evolutiva</option>
-                    <option value="Ciencia Ficción">Ciencia Ficción</option>
-                    <option value="Romance">Romance</option>
-                    <option value="Misterio">Misterio</option>
-                    <option value="Filosofía">Filosofía</option>
-                    <option value="Biología">Biología Sintética</option>
+                    <option value="" disabled className="text-muted/50">{t("publish.formCategoryPlaceholder")}</option>
+                    <option value="Ficción">{t("categories.fiction")}</option>
+                    <option value="Fantasía">{t("categories.fantasy")}</option>
+                    <option value="Ciencia Ficción">{t("categories.scienceFiction")}</option>
+                    <option value="Romance">{t("categories.romance")}</option>
+                    <option value="Misterio">{t("categories.mystery")}</option>
+                    <option value="Filosofía">{t("categories.philosophy")}</option>
+                    <option value="Biología">{t("categories.biology")}</option>
+                    <option value="Tecnología">{t("categories.technology")}</option>
+                    <option value="Poesía">{t("categories.poetry")}</option>
+                    <option value="Ciencia">{t("categories.science")}</option>
+                    <option value="Arte">{t("categories.art")}</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-muted">
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -252,7 +259,7 @@ export default function PublishPage() {
               {/* Cover Image Field */}
               <div className="space-y-3">
                 <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-muted">
-                  Portada del Libro
+                  {t("publish.formCoverLabel")}
                 </label>
                 <div className="mt-1 flex justify-center px-6 pt-10 pb-12 border border-border border-dashed rounded-2xl hover:border-primary/50 hover:bg-primary/5 transition-all bg-background group relative overflow-hidden">
                   <div className="space-y-4 text-center relative z-10 w-full">
@@ -264,7 +271,7 @@ export default function PublishPage() {
                         htmlFor="file-upload"
                         className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 transition-colors focus-within:outline-none"
                       >
-                        <span className="text-base font-serif">Explorar archivos</span>
+                        <span className="text-base font-serif">{t("publish.formCoverExplore")}</span>
                         <input
                           id="file-upload"
                           name="file-upload"
@@ -275,7 +282,7 @@ export default function PublishPage() {
                           disabled={isLoading}
                         />
                       </label>
-                      <p className="mt-1 text-xs opacity-70">o arrastra la imagen aquí</p>
+                      <p className="mt-1 text-xs opacity-70">{t("publish.formCoverDrag")}</p>
                     </div>
                     {coverFile && (
                       <div className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-medium">
@@ -290,14 +297,14 @@ export default function PublishPage() {
               {/* Synopsis Field */}
               <div className="space-y-3">
                 <label htmlFor="synopsis" className="block text-[11px] font-black uppercase tracking-[0.2em] text-muted">
-                  Sinopsis / Resumen
+                  {t("publish.formSynopsisLabel")}
                 </label>
                 <textarea
                   id="synopsis"
                   rows={4}
                   value={synopsis}
                   onChange={(e) => setSynopsis(e.target.value)}
-                  placeholder="Un breve resumen que atrapará al lector..."
+                  placeholder={t("publish.formSynopsisPlaceholder")}
                   className="block w-full px-5 py-4 rounded-xl border border-border bg-background focus:ring-1 focus:ring-primary focus:border-primary transition-colors text-text placeholder-muted/50 resize-y outline-none font-serif text-lg leading-relaxed"
                   disabled={isLoading}
                 />
@@ -307,10 +314,10 @@ export default function PublishPage() {
               <div className="space-y-6 pt-4 border-t border-border">
                 <div className="flex items-center justify-between">
                   <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-muted">
-                    Hojas del Manuscrito
+                    {t("publish.formPagesLabel")}
                   </label>
                   <span className="text-[10px] text-muted font-bold tracking-widest uppercase">
-                    {pages.length} {pages.length === 1 ? 'Página' : 'Páginas'}
+                    {pages.length} {pages.length === 1 ? t("publish.formPageCountSingular") : t("publish.formPageCountPlural")}
                   </span>
                 </div>
                 
@@ -319,7 +326,7 @@ export default function PublishPage() {
                     <div key={index} className="relative group/page bg-background border border-border rounded-2xl overflow-hidden transition-all focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50">
                       <div className="bg-surface px-4 py-3 flex items-center justify-between border-b border-border">
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted">
-                          Página {index + 1}
+                          {t("publish.formPageNumber")} {index + 1}
                         </span>
                         {pages.length > 1 && (
                           <button
@@ -334,7 +341,7 @@ export default function PublishPage() {
                               setPages(newPages);
                             }}
                             className="text-muted hover:text-red-400 transition-colors p-1"
-                            title="Eliminar página"
+                            title={t("publish.formPageDelete")}
                           >
                             <Trash2 size={14} />
                           </button>
@@ -361,7 +368,7 @@ export default function PublishPage() {
                           newPages[index] = e.target.value;
                           setPages(newPages);
                         }}
-                        placeholder={`Redacta la página ${index + 1} de tu obra aquí...`}
+                        placeholder={t("publish.formPagePlaceholder").replace("{index}", (index + 1).toString())}
                         className="block w-full px-5 py-6 bg-transparent text-text placeholder-muted/50 resize-y outline-none font-serif text-lg leading-relaxed"
                         disabled={isLoading}
                       />
@@ -376,7 +383,7 @@ export default function PublishPage() {
                     disabled={isLoading}
                     className="inline-flex items-center gap-2 px-6 py-3 border border-dashed border-border rounded-full text-xs font-black uppercase tracking-widest text-muted hover:text-primary hover:border-primary hover:bg-primary/5 transition-all"
                   >
-                    <Plus size={16} /> Añadir Página
+                    <Plus size={16} /> {t("publish.formAddPage")}
                   </button>
                 </div>
               </div>
@@ -398,9 +405,9 @@ export default function PublishPage() {
                   className="flex-1 flex justify-center items-center gap-2 py-4 px-8 border border-border rounded-full hover:bg-surface transition-all text-xs font-black uppercase tracking-[0.2em] text-muted relative"
                 >
                   {draftSaved ? (
-                     <><CheckCircle2 className="w-4 h-4 text-primary" /> Guardado localmente</>
+                     <><CheckCircle2 className="w-4 h-4 text-primary" /> {t("publish.draftSaved")}</>
                   ) : (
-                     <><Save className="w-4 h-4" /> Guardar Borrador</>
+                     <><Save className="w-4 h-4" /> {t("publish.saveDraft")}</>
                   )}
                 </button>
                 <button
@@ -411,11 +418,11 @@ export default function PublishPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Inmortalizando...
+                      {t("publish.submitLoading")}
                     </>
                   ) : (
                     <>
-                      Enviar al Archivo
+                      {t("publish.submitButton")}
                       <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </>
                   )}

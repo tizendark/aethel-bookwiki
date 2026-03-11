@@ -9,10 +9,12 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Loader2, Send, Image as ImageIcon, BookOpen, AlertCircle, CheckCircle2, ArrowLeft, Plus, Trash2, Save, Info } from "lucide-react";
 import RichTextToolbar from "@/components/RichTextToolbar";
+import { useI18n } from "@/contexts/I18nContext";
 
 export default function EditBookPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
+  const { t } = useI18n();
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
@@ -198,7 +200,7 @@ export default function EditBookPage() {
     return (
       <div className="min-h-screen bg-background py-32 flex flex-col items-center justify-center text-muted">
         <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
-        <p className="text-sm font-black uppercase tracking-[0.2em]">Cargando Entorno Seguro...</p>
+        <p className="text-sm font-black uppercase tracking-[0.2em]">{t("edit.fetchLoading")}</p>
       </div>
     );
   }
@@ -209,15 +211,15 @@ export default function EditBookPage() {
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-500/10 mb-8 border border-red-500/20">
           <AlertCircle className="w-10 h-10 text-red-400" />
         </div>
-        <h2 className="text-3xl font-serif font-semibold mb-4 text-white">Acceso Restringido</h2>
+        <h2 className="text-3xl font-serif font-semibold mb-4 text-white">{t("publish.restricted")}</h2>
         <p className="text-muted leading-relaxed mb-10 max-w-sm mx-auto">
-          Debes identificarte en el Gremio para proponer cambios al archivo.
+          {t("edit.restrictedDesc")}
         </p>
         <Link
           href="/login"
           className="inline-flex items-center justify-center px-8 py-4 border border-border text-xs font-black uppercase tracking-[0.2em] rounded-full text-text hover:bg-white hover:text-black transition-all duration-300 shadow-editorial"
         >
-          Identificarse
+          {t("publish.loginButton")}
         </Link>
       </div>
     );
@@ -234,17 +236,17 @@ export default function EditBookPage() {
             <div className="w-12 h-12 bg-surface rounded-full flex items-center justify-center border border-border group-hover:border-primary group-hover:text-primary transition-all">
                <ArrowLeft size={18} />
             </div>
-            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted group-hover:text-primary">Cancelar</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted group-hover:text-primary">{t("edit.cancel")}</span>
           </Link>
           <div className="flex items-center justify-center gap-2 px-4 py-2 mx-auto bg-primary/10 rounded-full text-primary w-fit text-[10px] font-black uppercase tracking-[0.3em] mb-8">
             <BookOpen size={12} />
-            {isModerator ? 'Edición Directa' : 'Edición Colaborativa'}
+            {isModerator ? t("edit.headerTagDirect") : t("edit.headerTagCollab")}
           </div>
           <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">
-             Reescribe la <span className="text-primary italic font-light">Historia</span>
+             {t("edit.title")} <span className="text-primary italic font-light">{t("edit.titleHighlight")}</span>
           </h1>
           <p className="mt-4 text-muted font-light px-8 max-w-xl mx-auto">
-            Propón mejoras, correcciones o expansiones a esta obra. Los guardianes del archivo revisarán tu contribución antes de integrarla.
+            {t("edit.subtitle")}
           </p>
         </div>
 
@@ -257,18 +259,18 @@ export default function EditBookPage() {
                 <CheckCircle2 className="w-10 h-10 text-primary" />
               </div>
               <h2 className="text-3xl font-serif font-semibold mb-4">
-                {isModerator ? 'Cambios Aplicados' : 'Edición en Revisión'}
+                {isModerator ? t("edit.successAuthTitle1") : t("edit.successAuthTitle2")}
               </h2>
               <p className="text-muted leading-relaxed mb-10 max-w-sm mx-auto">
                 {isModerator 
-                  ? 'La obra ha sido actualizada directamente en el registro público.'
-                  : 'Tu contribución ha sido enviada a los curadores. Te agradecemos por enriquecer nuestra biblioteca viviente.'}
+                  ? t("edit.successAuthDesc1")
+                  : t("edit.successAuthDesc2")}
               </p>
               <Link
                 href={`/book/${id}`}
                 className="inline-flex items-center justify-center px-8 py-4 bg-white text-black text-xs font-black uppercase tracking-[0.2em] rounded-full hover:bg-primary hover:text-white transition-all shadow-editorial"
               >
-                Volver a la Lectura
+                {t("edit.backToBook")}
               </Link>
             </div>
           ) : (
@@ -277,10 +279,10 @@ export default function EditBookPage() {
               <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 flex items-start gap-3">
                 <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div className="flex flex-col">
-                  <h4 className="text-sm font-semibold text-white">Borrador de Edición</h4>
+                  <h4 className="text-sm font-semibold text-white">{t("edit.draftWarningTitle")}</h4>
                   <p className="text-xs text-muted/80 mt-1 leading-relaxed">
-                    Si no terminas tu revisión ahora, puedes guardarla como borrador. 
-                    <strong className="text-primary/80 font-normal"> El borrador se guarda en la memoria de este navegador.</strong> Si cierras sesión o entras desde otro dispositivo, perderás el progreso no guardado.
+                    {t("edit.draftWarningDesc")} 
+                    <strong className="text-primary/80 font-normal"> {t("edit.draftWarningHighlight")}</strong> {t("edit.draftWarningDesc2")}
                   </p>
                 </div>
               </div>
@@ -288,7 +290,7 @@ export default function EditBookPage() {
               {/* Category */}
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-[0.2em] text-muted flex items-center gap-2">
-                  1. Clasificación
+                  {t("edit.formCategoryLabel")}
                 </label>
                 <select
                   value={category}
@@ -296,26 +298,31 @@ export default function EditBookPage() {
                   required
                   className="w-full bg-background border border-border rounded-xl px-4 py-4 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer hover:border-white/20 transition-colors"
                 >
-                  <option value="" disabled>Selecciona la nueva naturaleza de la obra...</option>
-                  <option value="Philosophy">Philosophy (Filosofía)</option>
-                  <option value="Technology">Technology (Tecnología)</option>
-                  <option value="Fiction">Fiction (Ficción Viva)</option>
-                  <option value="Poetry">Poetry (Poesía)</option>
-                  <option value="Science">Science (Ciencia)</option>
-                  <option value="Art">Art (Arte Visuales)</option>
+                  <option value="" disabled>{t("edit.formCategoryPlaceholder")}</option>
+                  <option value="Ficción">{t("categories.fiction")}</option>
+                  <option value="Fantasía">{t("categories.fantasy")}</option>
+                  <option value="Ciencia Ficción">{t("categories.scienceFiction")}</option>
+                  <option value="Romance">{t("categories.romance")}</option>
+                  <option value="Misterio">{t("categories.mystery")}</option>
+                  <option value="Filosofía">{t("categories.philosophy")}</option>
+                  <option value="Biología">{t("categories.biology")}</option>
+                  <option value="Tecnología">{t("categories.technology")}</option>
+                  <option value="Poesía">{t("categories.poetry")}</option>
+                  <option value="Ciencia">{t("categories.science")}</option>
+                  <option value="Arte">{t("categories.art")}</option>
                 </select>
               </div>
 
               {/* Title */}
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-[0.2em] text-muted">
-                  2. Título de la Obra
+                  {t("edit.formTitleLabel")}
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Escribe el título corregido aquí..."
+                  placeholder={t("edit.formTitlePlaceholder")}
                   required
                   className="w-full bg-background border border-border rounded-xl px-4 py-4 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors text-lg font-serif placeholder:font-sans placeholder:text-sm"
                 />
@@ -324,7 +331,7 @@ export default function EditBookPage() {
               {/* Optional Cover */}
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-[0.2em] text-muted flex items-center justify-between">
-                  <span>3. Nueva Cubierta Visual <span className="text-[9px] text-muted-foreground ml-2">(Opcional)</span></span>
+                  <span>{t("edit.formCoverLabel")} <span className="text-[9px] text-muted-foreground ml-2">{t("edit.formCoverOptional")}</span></span>
                 </label>
                 <div className="relative group cursor-pointer">
                   <input
@@ -338,9 +345,9 @@ export default function EditBookPage() {
                   >
                     <ImageIcon className={`w-8 h-8 mb-3 ${coverFile ? 'text-primary' : 'text-muted group-hover:text-primary/70'} transition-colors`} />
                     <span className="text-sm font-medium text-text text-center">
-                      {coverFile ? coverFile.name : currentCoverUrl ? "Reemplazar imagen actual" : "Arrastra o haz clic para subir una imagen de portada"}
+                      {coverFile ? coverFile.name : currentCoverUrl ? t("edit.formCoverReplace") : t("edit.formCoverDrag")}
                     </span>
-                    <span className="text-[10px] text-muted mt-2 tracking-wider">JPG, PNG o WEBP (Recomendado 3:4)</span>
+                    <span className="text-[10px] text-muted mt-2 tracking-wider">JPG, PNG o WEBP</span>
                   </div>
                 </div>
               </div>
@@ -348,7 +355,7 @@ export default function EditBookPage() {
               {/* Synopsis Field */}
               <div className="space-y-3">
                 <label htmlFor="synopsis" className="text-xs font-black uppercase tracking-[0.2em] text-muted flex items-center gap-2">
-                  4. Sinopsis / Resumen
+                  {t("edit.formSynopsisLabel")}
                 </label>
                 <textarea
                   id="synopsis"
@@ -364,10 +371,10 @@ export default function EditBookPage() {
               <div className="space-y-6 pt-4 border-t border-border">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-black uppercase tracking-[0.2em] text-muted flex items-center gap-2">
-                    5. Hojas del Manuscrito
+                    {t("edit.formPagesLabel")}
                   </label>
                   <span className="text-[10px] text-muted font-bold tracking-widest uppercase">
-                    {pages.length} {pages.length === 1 ? 'Página' : 'Páginas'}
+                    {pages.length} {pages.length === 1 ? t("publish.formPageCountSingular") : t("publish.formPageCountPlural")}
                   </span>
                 </div>
                 
@@ -376,7 +383,7 @@ export default function EditBookPage() {
                      <div key={index} className="relative group/page bg-background border border-border rounded-2xl overflow-hidden transition-all focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50">
                       <div className="bg-surface px-4 py-3 flex items-center justify-between border-b border-border">
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted">
-                          Página {index + 1}
+                          {t("publish.formPageNumber")} {index + 1}
                         </span>
                         {pages.length > 1 && (
                           <button
@@ -388,7 +395,7 @@ export default function EditBookPage() {
                               setPages(newPages);
                             }}
                             className="text-muted hover:text-red-400 transition-colors p-1"
-                            title="Eliminar página"
+                            title={t("publish.formPageDelete")}
                           >
                             <Trash2 size={14} />
                           </button>
@@ -415,7 +422,7 @@ export default function EditBookPage() {
                           newPages[index] = e.target.value;
                           setPages(newPages);
                         }}
-                        placeholder={`Redacta la edición para la página ${index + 1} de tu obra aquí...`}
+                        placeholder={t("edit.formPagePlaceholder").replace("{index}", (index + 1).toString())}
                         className="block w-full px-5 py-6 bg-transparent text-text placeholder-muted/50 resize-y outline-none font-serif text-lg leading-relaxed"
                         disabled={isLoading}
                       />
@@ -430,7 +437,7 @@ export default function EditBookPage() {
                     disabled={isLoading}
                     className="inline-flex items-center gap-2 px-6 py-3 border border-dashed border-border rounded-full text-xs font-black uppercase tracking-widest text-muted hover:text-primary hover:border-primary hover:bg-primary/5 transition-all"
                   >
-                    <Plus size={16} /> Añadir Página
+                    <Plus size={16} /> {t("publish.formAddPage")}
                   </button>
                 </div>
               </div>
@@ -451,9 +458,9 @@ export default function EditBookPage() {
                   className="flex-1 flex justify-center items-center gap-2 py-5 px-8 border border-border rounded-full hover:bg-surface transition-all text-xs font-black uppercase tracking-[0.2em] text-muted relative"
                 >
                   {draftSaved ? (
-                     <><CheckCircle2 className="w-4 h-4 text-primary" /> Guardado localmente</>
+                     <><CheckCircle2 className="w-4 h-4 text-primary" /> {t("publish.draftSaved")}</>
                   ) : (
-                     <><Save className="w-4 h-4" /> Guardar Borrador</>
+                     <><Save className="w-4 h-4" /> {t("publish.saveDraft")}</>
                   )}
                 </button>
                 <button
@@ -466,12 +473,12 @@ export default function EditBookPage() {
                     {isLoading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Procesando Vínculos...
+                        {t("edit.submitLoading")}
                       </>
                     ) : (
                       <>
                         <Send size={16} />
-                        {isModerator ? 'Aplicar Cambios a Obra' : 'Enviar Propuesta'}
+                        {isModerator ? t("edit.submitDirect") : t("edit.submitCollab")}
                       </>
                     )}
                   </span>

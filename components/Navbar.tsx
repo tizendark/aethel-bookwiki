@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { BookOpen, Search, Menu, User, LogOut, ArrowLeft, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useI18n } from '@/contexts/I18nContext';
 
 export default function Navbar() {
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
@@ -12,6 +13,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter(); // Added useRouter
   const isHome = pathname === '/'; // Added isHome
+  const { t, language, setLanguage } = useI18n();
 
   useEffect(() => {
     import('@/lib/firebase').then(({ auth, db }) => {
@@ -47,7 +49,7 @@ export default function Navbar() {
             <button
               onClick={() => router.back()}
               className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all text-muted"
-              title="Volver atrás" // Updated title
+              title={t("navbar.back")} // Updated title
             >
               <ArrowLeft size={18} />
             </button>
@@ -62,18 +64,25 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-10 text-[11px] uppercase tracking-[0.25em] font-bold text-neutral-400">
-          <Link href="/library" className="hover:text-primary transition-colors">Explorer</Link>
-          <Link href="/publish" className="hover:text-primary transition-colors">Publish</Link>
-          <Link href="/manifesto" className="hover:text-primary transition-colors">Manifesto</Link>
+          <Link href="/library" className="hover:text-primary transition-colors">{t("navbar.explorer")}</Link>
+          <Link href="/publish" className="hover:text-primary transition-colors">{t("navbar.publish")}</Link>
+          <Link href="/manifesto" className="hover:text-primary transition-colors">{t("navbar.manifesto")}</Link>
           {user?.role === 'moderator' && (
             <Link href="/moderation" className="text-primary hover:text-primary/80 transition-colors flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-              Moderation
+              {t("navbar.moderation")}
             </Link>
           )}
         </div>
 
         <div className="flex items-center gap-4 md:gap-6">
+          <button 
+            onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+            className="text-[10px] font-black tracking-widest uppercase hover:text-primary transition-colors border border-border px-3 py-1.5 rounded-full"
+            title="Cambiar Idioma / Change Language"
+          >
+            {language === 'en' ? 'ES' : 'EN'}
+          </button>
           <Link href="/library?search=focus" className="p-2 hover:bg-white/5 rounded-full transition-colors text-neutral-400">
             <Search size={20} />
           </Link>
@@ -83,7 +92,7 @@ export default function Navbar() {
               <Link
                 href="/my-works"
                 className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:border-primary/50 hover:text-primary transition-colors"
-                title="Mis Obras y Borradores"
+                title={t("navbar.myWorks")}
               >
                 <Bookmark size={18} />
               </Link>
@@ -94,7 +103,7 @@ export default function Navbar() {
               <button 
                 onClick={() => import('@/lib/firebase').then(({auth}) => import('firebase/auth').then(({signOut}) => signOut(auth)))}
                 className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center hover:border-red-500/50 hover:text-red-400 transition-colors"
-                title="Cerrar sesión"
+                title={t("navbar.signOut")}
               >
                 <LogOut size={18} />
               </button>
@@ -104,7 +113,7 @@ export default function Navbar() {
               href="/login" 
               className="bg-white text-black px-6 py-2.5 rounded-full text-[10px] font-black tracking-widest uppercase hover:bg-primary hover:text-white transition-all shadow-soft"
             >
-              Sign In
+              {t("navbar.signIn")}
             </Link>
           )}
           

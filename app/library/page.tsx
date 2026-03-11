@@ -6,6 +6,7 @@ import { collection, getDocs, orderBy, query as firestoreQuery } from 'firebase/
 import BookCard from '@/components/BookCard';
 import { BookOpen, Search } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import { useI18n, getCategoryTranslation } from '@/contexts/I18nContext';
 
 interface Book {
   id: string;
@@ -22,6 +23,8 @@ export default function LibraryPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All'); // New state for active category
+  const { t } = useI18n();
   
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchParams = useSearchParams();
@@ -60,7 +63,9 @@ export default function LibraryPage() {
     const authorMatch = (book.author || 'Anonymous Author').toLowerCase().includes(queryLower);
     const categoryMatch = book.category.toLowerCase().includes(queryLower);
     
-    return titleMatch || authorMatch || categoryMatch;
+    const categoryFilter = activeCategory === 'All' || book.category === activeCategory;
+
+    return (titleMatch || authorMatch || categoryMatch) && categoryFilter;
   });
 
   return (
@@ -72,13 +77,13 @@ export default function LibraryPage() {
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-[10px] font-black uppercase tracking-[0.3em] mb-6">
               <BookOpen size={12} />
-              El Archivo
+              {t("library.headerTag")}
             </div>
             <h1 className="text-5xl md:text-7xl font-serif font-bold tracking-tight">
-              Librería <span className="text-primary italic font-light">Global</span>
+              {t("library.title")} <span className="text-primary italic font-light">{t("library.titleHighlight")}</span>
             </h1>
             <p className="mt-6 text-xl text-muted font-serif max-w-2xl leading-relaxed">
-              Explora nuestra colección completa de obras aprobadas. Cada libro aquí representa una pieza del conocimiento vivo de Aethel.
+              {t("library.subtitle")}
             </p>
           </div>
           
@@ -91,10 +96,27 @@ export default function LibraryPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar título, autor o categoría..."
+              placeholder={t("library.searchPlaceholder")}
               className="block w-full pl-12 pr-4 py-4 rounded-full border border-border bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-all text-sm outline-none shadow-soft text-text placeholder-muted/50"
             />
           </div>
+        </div>
+
+        {/* Category Filter */}
+        <div className="flex flex-wrap gap-3 mb-16">
+          {["All", "Ficción", "Ciencia Ficción", "Filosofía", "Biología Sintética"].map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-all ${
+                activeCategory === cat 
+                  ? "bg-primary text-white shadow-editorial" 
+                  : "bg-surface border border-border text-muted hover:text-white"
+              }`}
+            >
+              {cat === "All" ? t("library.allCategories") : getCategoryTranslation(cat, t)}
+            </button>
+          ))}
         </div>
 
         {/* Gallery */}
@@ -127,9 +149,9 @@ export default function LibraryPage() {
               <div className="w-16 h-16 bg-background rounded-full flex items-center justify-center mx-auto mb-6">
                 <Search className="w-8 h-8 text-muted" />
               </div>
-              <h3 className="text-2xl font-serif font-semibold mb-2">No se encontraron resultados</h3>
+              <h3 className="text-2xl font-serif font-semibold mb-2">{t("library.emptyTitle")}</h3>
               <p className="text-muted text-lg max-w-md mx-auto">
-                No hay obras que coincidan con "{searchQuery}". Intenta con otras palabras clave.
+                {t("library.emptyDesc").replace("{query}", searchQuery)}
               </p>
             </div>
           )}

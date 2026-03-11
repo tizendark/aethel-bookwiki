@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
+import { useI18n, getCategoryTranslation } from '@/contexts/I18nContext';
 
 interface BookCardProps {
   id: string;
@@ -14,6 +15,8 @@ interface BookCardProps {
 }
 
 export default function BookCard({ id, title, author, category, cover, description }: BookCardProps) {
+  const { t } = useI18n();
+  
   return (
     <Link href={`/book/${id}`} className="block group">
       <motion.div 
@@ -37,7 +40,7 @@ export default function BookCard({ id, title, author, category, cover, descripti
       
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <span className="text-[10px] uppercase tracking-[0.3em] font-black text-primary">{category}</span>
+          <span className="text-[10px] uppercase tracking-[0.3em] font-black text-primary">{getCategoryTranslation(category, t)}</span>
           <div className="h-[1px] flex-1 bg-border" />
         </div>
         <h3 className="text-2xl font-serif font-semibold leading-tight group-hover:text-primary transition-colors">

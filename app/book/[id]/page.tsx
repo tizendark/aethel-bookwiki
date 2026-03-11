@@ -8,6 +8,7 @@ import Link from "next/link";
 import { BookOpen, Edit3, Loader2, ArrowLeft, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useI18n, getCategoryTranslation } from "@/contexts/I18nContext";
 
 interface Book {
   id: string;
@@ -28,6 +29,7 @@ export default function BookViewPage() {
   const [isModerator, setIsModerator] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
+  const { t } = useI18n();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -78,7 +80,7 @@ export default function BookViewPage() {
     return (
       <div className="min-h-screen bg-background py-32 flex flex-col items-center justify-center text-muted">
         <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
-        <p className="text-sm font-black uppercase tracking-[0.2em]">Cargando Manuscrito...</p>
+        <p className="text-sm font-black uppercase tracking-[0.2em]">{t("book.loading")}</p>
       </div>
     );
   }
@@ -89,15 +91,15 @@ export default function BookViewPage() {
         <div className="w-20 h-20 bg-surface rounded-full flex items-center justify-center mb-6">
           <BookOpen className="w-10 h-10 text-muted" />
         </div>
-        <h2 className="text-4xl font-serif font-bold mb-4">Obra no encontrada</h2>
+        <h2 className="text-4xl font-serif font-bold mb-4">{t("book.notFoundTitle")}</h2>
         <p className="text-muted max-w-md mx-auto mb-8">
-          El manuscrito que estás buscando no existe o aún no ha sido aprobado por los curadores.
+          {t("book.notFoundDesc")}
         </p>
         <button 
           onClick={() => router.back()}
           className="inline-flex items-center gap-2 px-6 py-3 border border-border rounded-full hover:bg-surface transition-all text-xs font-black uppercase tracking-widest text-text"
         >
-          <ArrowLeft size={16} /> Volver al Archivo
+          <ArrowLeft size={16} /> {t("book.backToArchive")}
         </button>
       </div>
     );
@@ -114,7 +116,7 @@ export default function BookViewPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("¿Estás seguro de que deseas ELIMINAR permanentemente esta obra del registro público? Esta acción no se puede deshacer.")) {
+    if (!window.confirm(t("book.deleteConfirm"))) {
       return;
     }
     
@@ -124,7 +126,7 @@ export default function BookViewPage() {
       router.push('/library');
     } catch (error) {
       console.error("Error al eliminar la obra:", error);
-      alert("Hubo un error al intentar eliminar la obra.");
+      alert(t("book.deleteError"));
       setIsDeleting(false);
     }
   };
@@ -137,16 +139,16 @@ export default function BookViewPage() {
         <header className="mb-16 text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-[10px] font-black uppercase tracking-[0.3em] mb-8">
             <BookOpen size={12} />
-            {book.category}
+            {getCategoryTranslation(book.category, t)}
           </div>
           <h1 className="text-5xl md:text-7xl font-serif font-bold tracking-tighter mb-8 leading-[1.1]">
             {book.title}
           </h1>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-muted font-medium uppercase tracking-widest pt-8 border-t border-border">
-            <span>Redactado por <strong className="text-white">{book.author || 'Anónimo'}</strong></span>
+            <span>{t("book.writtenBy")}<strong className="text-white">{book.author || t("book.anonymous")}</strong></span>
             <span className="hidden sm:inline">•</span>
-            <span>ID: {book.id.slice(0, 8)}</span>
+            <span>{t("book.bookId").replace("{id}", book.id.slice(0, 8))}</span>
           </div>
         </header>
 
@@ -163,7 +165,7 @@ export default function BookViewPage() {
         {/* Synopsis Area */}
         {book.synopsis && (
           <div className="max-w-2xl mx-auto mb-16 text-center">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-6">Sinopsis del Autor</h3>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-6">{t("book.authorSynopsis")}</h3>
             <p className="text-xl md:text-2xl font-serif font-light leading-relaxed text-neutral-300 italic">
               "{book.synopsis}"
             </p>
@@ -181,7 +183,7 @@ export default function BookViewPage() {
               <ChevronLeft size={20} />
             </button>
             <span className="font-serif text-sm tracking-widest text-muted">
-              Página <strong className="text-white">{currentPage + 1}</strong> de {pages.length}
+              {t("book.pageXofY").replace("{current}", (currentPage + 1).toString()).replace("{total}", pages.length.toString())}
             </span>
             <button 
               onClick={nextSlide}
@@ -200,7 +202,7 @@ export default function BookViewPage() {
                 className="inline-flex items-center gap-2 px-5 py-2 sm:py-3 bg-red-500/10 border border-red-500/30 rounded-full text-[10px] font-black uppercase tracking-wider text-red-500 hover:bg-red-500 hover:text-white hover:border-transparent transition-all shadow-soft group"
               >
                 {isDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} className="group-hover:text-white transition-colors" />}
-                <span className="hidden sm:inline">{isDeleting ? 'Eliminando...' : 'Eliminar Obra'}</span>
+                <span className="hidden sm:inline">{isDeleting ? t("book.deleting") : t("book.deleteWork")}</span>
               </button>
             )}
 
@@ -210,9 +212,9 @@ export default function BookViewPage() {
             >
               <Edit3 size={14} className="text-muted group-hover:text-white transition-colors" />
               <span className="hidden sm:inline">
-                {isModerator ? 'Editar' : 'Proponer Edición'}
+                {isModerator ? t("book.edit") : t("book.proposeEdit")}
               </span>
-              <span className="sm:hidden">Editar</span>
+              <span className="sm:hidden">{t("book.edit")}</span>
             </Link>
           </div>
         </div>

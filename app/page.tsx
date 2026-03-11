@@ -6,6 +6,7 @@ import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import BookCard from '@/components/BookCard';
 import { ArrowRight, Sparkles, BookOpen } from 'lucide-react';
 import Link from 'next/link';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface Book {
   id: string;
@@ -23,6 +24,7 @@ interface Book {
 export default function Home() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useI18n();
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -55,23 +57,23 @@ export default function Home() {
           <div className="max-w-4xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-[10px] font-black uppercase tracking-[0.3em] mb-10">
               <Sparkles size={12} />
-              The Future of Knowledge
+              {t("home.heroTag")}
             </div>
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter leading-[0.85] mb-12">
-              Living <br />
-              <span className="text-primary italic font-serif font-normal">Literature.</span>
+              {t("home.heroTitle1")} <br />
+              <span className="text-primary italic font-serif font-normal">{t("home.heroTitle2")}</span>
             </h1>
             <p className="text-xl md:text-2xl text-neutral-400 font-serif leading-relaxed max-w-2xl mb-12">
-              Aethel is a curated sanctuary for evolving books. Open-source knowledge that grows, adapts, and breathes with human discovery.
+              {t("home.heroDesc")}
             </p>
             
             <div className="flex flex-wrap items-center gap-8">
               <Link href="/library" className="bg-white text-black px-10 py-5 rounded-full font-black text-[10px] tracking-[0.2em] uppercase hover:bg-primary hover:text-white transition-all flex items-center gap-4 group shadow-editorial">
-                Explore Library
+                {t("home.exploreBtn")}
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link href="/manifesto" className="text-[10px] font-black uppercase tracking-[0.2em] border-b-2 border-white/10 pb-1 hover:border-primary transition-all">
-                Our Manifesto
+                {t("home.manifestoBtn")}
               </Link>
             </div>
           </div>
@@ -82,13 +84,13 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-6 md:px-12 pb-40">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
           <div className="max-w-xl">
-            <h2 className="text-[11px] uppercase tracking-[0.5em] font-black text-primary mb-6">Curated Selection</h2>
-            <h3 className="text-4xl md:text-5xl font-serif font-semibold leading-tight">Current Editions</h3>
+            <h2 className="text-[11px] uppercase tracking-[0.5em] font-black text-primary mb-6">{t("home.curatedTag")}</h2>
+            <h3 className="text-4xl md:text-5xl font-serif font-semibold leading-tight">{t("home.currentEditions")}</h3>
           </div>
           <div className="flex items-center gap-4">
             <div className="h-[1px] w-20 bg-border" />
             <Link href="/library" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">
-              View Full Archive
+              {t("home.viewArchive")}
             </Link>
           </div>
         </div>
@@ -121,7 +123,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="py-20 text-center w-full">
-            <p className="text-muted text-lg font-serif">La biblioteca está temporalmente vacía o no hay libros aprobados aún.</p>
+            <p className="text-muted text-lg font-serif">{t("home.emptyGallery")}</p>
           </div>
         )}
       </section>
@@ -143,7 +145,7 @@ export default function Home() {
           </div>
           
           <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-600">
-            © 2025 Aethel Platform.
+            {t("home.footerRights")}
           </p>
         </div>
       </footer>
