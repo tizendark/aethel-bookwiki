@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query as firestoreQuery } from 'firebase/firestore';
 import BookCard from '@/components/BookCard';
@@ -19,7 +19,7 @@ interface Book {
   createdAt: any;
 }
 
-export default function LibraryPage() {
+function LibraryContent() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -159,5 +159,17 @@ export default function LibraryPage() {
         
       </div>
     </div>
+  );
+}
+
+export default function LibraryPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background py-32 px-4 flex flex-col items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
+      </div>
+    }>
+      <LibraryContent />
+    </Suspense>
   );
 }
