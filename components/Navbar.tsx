@@ -59,7 +59,7 @@ export default function Navbar() {
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white transition-transform group-hover:scale-105 duration-300 shadow-lg shadow-primary/20">
               <BookOpen size={22} strokeWidth={2.5} />
             </div>
-            <span className="text-xl font-bold tracking-tighter uppercase hidden sm:block">Aethel</span>
+            <span className="text-xl font-bold tracking-tighter uppercase hidden sm:block">LibroVivo</span>
           </Link>
         </div>
 

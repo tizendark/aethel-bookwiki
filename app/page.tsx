@@ -135,7 +135,7 @@ export default function Home() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
               <BookOpen size={18} />
             </div>
-            <span className="text-lg font-bold tracking-tighter uppercase">Aethel</span>
+            <span className="text-lg font-bold tracking-tighter uppercase">LibroVivo</span>
           </div>
           
           <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">

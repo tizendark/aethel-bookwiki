@@ -39,7 +39,7 @@ export default function MyWorksPage() {
     });
 
     // Check for local draft regardless of auth state (though technically they need auth to publish)
-    const savedDraft = localStorage.getItem("aethel_draft");
+    const savedDraft = localStorage.getItem("librovivo_draft");
     if (savedDraft) {
       try {
         setLocalDraft(JSON.parse(savedDraft));
@@ -52,9 +52,9 @@ export default function MyWorksPage() {
     const editDrafts = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith("aethel_edit_draft_")) {
+      if (key && key.startsWith("librovivo_edit_draft_")) {
         try {
-          const draftId = key.replace("aethel_edit_draft_", "");
+          const draftId = key.replace("librovivo_edit_draft_", "");
           const draftData = JSON.parse(localStorage.getItem(key) || "{}");
           editDrafts.push({ ...draftData, bookId: draftId });
         } catch(e) {

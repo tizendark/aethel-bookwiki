@@ -159,7 +159,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-12 pr-4 py-3 rounded-xl border border-border bg-background focus:ring-1 focus:ring-primary focus:border-primary transition-colors text-text placeholder-muted/50 outline-none"
-                  placeholder="acólito@aethel.com"
+                  placeholder="acólito@librovivo.com"
                 />
               </div>
             </div>

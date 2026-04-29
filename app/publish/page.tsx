@@ -31,7 +31,7 @@ export default function PublishPage() {
 
   // Load draft from localStorage on mount
   useEffect(() => {
-    const savedDraft = localStorage.getItem("aethel_draft");
+    const savedDraft = localStorage.getItem("librovivo_draft");
     if (savedDraft) {
       try {
         const draftData = JSON.parse(savedDraft);
@@ -66,7 +66,7 @@ export default function PublishPage() {
       synopsis,
       pages,
     };
-    localStorage.setItem("aethel_draft", JSON.stringify(draftData));
+    localStorage.setItem("librovivo_draft", JSON.stringify(draftData));
     setDraftSaved(true);
     setTimeout(() => setDraftSaved(false), 3000);
   };
@@ -122,7 +122,7 @@ export default function PublishPage() {
       setSynopsis("");
       setPages([""]);
       setCoverFile(null);
-      localStorage.removeItem("aethel_draft"); // Borrar el borrador si se publicó con éxito
+      localStorage.removeItem("librovivo_draft"); // Borrar el borrador si se publicó con éxito
       
     } catch (err: any) {
       setError(err.message || "Ocurrió un error inesperado.");

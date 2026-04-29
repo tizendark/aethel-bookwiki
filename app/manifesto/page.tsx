@@ -13,7 +13,7 @@ export default function ManifestoPage() {
             Fundación
           </div>
           <h1 className="text-5xl md:text-8xl font-serif font-bold tracking-tighter mb-8 leading-[0.9]">
-            The Aethel <br />
+            The LibroVivo <br />
             <span className="text-primary italic font-light">Manifesto.</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted font-serif leading-relaxed max-w-2xl mx-auto">
@@ -26,12 +26,12 @@ export default function ManifestoPage() {
           
           <h2>I. El Fin del Papel Estático</h2>
           <p>
-            Durante siglos, un libro impreso ha representado el final de un pensamiento. Una vez encuadernado, las ideas quedan congeladas en el tiempo, vulnerables a la obsolescencia. En Aethel, creemos que un libro debe ser el <em>comienzo</em> de una conversación, no su conclusión definitiva.
+            Durante siglos, un libro impreso ha representado el final de un pensamiento. Una vez encuadernado, las ideas quedan congeladas en el tiempo, vulnerables a la obsolescencia. En LibroVivo, creemos que un libro debe ser el <em>comienzo</em> de una conversación, no su conclusión definitiva.
           </p>
 
           <h2>II. Inteligencia Colectiva</h2>
           <p>
-            Ninguna obra es verdaderamente obra de un solo autor. El conocimiento humano se construye sobre las iteraciones de mentes pasadas. Aethel democratiza el mantenimiento de la sabiduría, permitiendo que la comunidad refine, corrija y expanda los textos existentes mediante nuestro sistema de <strong>Edición Colaborativa</strong>.
+            Ninguna obra es verdaderamente obra de un solo autor. El conocimiento humano se construye sobre las iteraciones de mentes pasadas. LibroVivo democratiza el mantenimiento de la sabiduría, permitiendo que la comunidad refine, corrija y expanda los textos existentes mediante nuestro sistema de <strong>Edición Colaborativa</strong>.
           </p>
 
           <h2>III. Curaduría sobre Ruido</h2>
@@ -40,7 +40,7 @@ export default function ManifestoPage() {
           </p>
           
           <blockquote className="border-l-2 border-primary pl-6 my-12 italic text-2xl text-white font-light">
-            "Aethel es un jardín digital. Las ideas florecen aquí, pero requieren de jardineros diligentes para no ahogarse en maleza."
+            "LibroVivo es un jardín digital. Las ideas florecen aquí, pero requieren de jardineros diligentes para no ahogarse en maleza."
           </blockquote>
 
           <h2>IV. Estética como Función</h2>
@@ -50,7 +50,7 @@ export default function ManifestoPage() {
 
           <h2>V. Open Source Knowledge</h2>
           <p>
-            Toda la obra aprobada en Aethel pertenece a la humanidad. Aspiramos a ser el repositorio definitivo del pensamiento moderno en evolución constante.
+            Toda la obra aprobada en LibroVivo pertenece a la humanidad. Aspiramos a ser el repositorio definitivo del pensamiento moderno en evolución constante.
           </p>
 
         </div>

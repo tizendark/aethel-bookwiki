@@ -22,7 +22,7 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("aethel_lang") as Language;
+    const savedLang = localStorage.getItem("librovivo_lang") as Language;
     if (savedLang && (savedLang === "es" || savedLang === "en")) {
       setLanguage(savedLang);
     } else {
@@ -38,7 +38,7 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
 
   const changeLanguage = (lang: Language) => {
     setLanguage(lang);
-    localStorage.setItem("aethel_lang", lang);
+    localStorage.setItem("librovivo_lang", lang);
   };
 
   const t = (path: string): string => {

@@ -1,5 +1,5 @@
 /*
-  # Aethel Platform Schema
+  # LibroVivo Platform Schema
   1. Tables:
     - profiles: User roles and metadata
     - books: The living books (approved and pending)

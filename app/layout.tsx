@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Aethel | Living Literature",
+  title: "LibroVivo | Living Literature",
   description: "A curated sanctuary for evolving books.",
 };
 

@@ -71,7 +71,7 @@ export default function EditBookPage() {
           const pagesArray = Array.isArray(data.content) ? data.content : [data.content || ""];
           
           // Check for draft and overwrite original data if exists
-          const savedDraft = localStorage.getItem(`aethel_edit_draft_${id}`);
+          const savedDraft = localStorage.getItem(`librovivo_edit_draft_${id}`);
           if (savedDraft) {
             try {
               const draftData = JSON.parse(savedDraft);
@@ -124,7 +124,7 @@ export default function EditBookPage() {
       synopsis,
       pages,
     };
-    localStorage.setItem(`aethel_edit_draft_${id}`, JSON.stringify(draftData));
+    localStorage.setItem(`librovivo_edit_draft_${id}`, JSON.stringify(draftData));
     setDraftSaved(true);
     setTimeout(() => setDraftSaved(false), 3000);
   };
@@ -187,7 +187,7 @@ export default function EditBookPage() {
       }
 
       setSuccess(true);
-      localStorage.removeItem(`aethel_edit_draft_${id}`); // Borrar el borrador de edición al enviar
+      localStorage.removeItem(`librovivo_edit_draft_${id}`); // Borrar el borrador de edición al enviar
     } catch (err: any) {
       setError(err.message || "Ocurrió un error inesperado al enviar la propuesta.");
     } finally {
