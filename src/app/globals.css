@@ -5,12 +5,20 @@
 @tailwind utilities;
 
 :root {
+  /* Estructura Base */
   --background: #171717;
   --surface: #262626;
-  --primary: #9E7FFF;
+  --border: #2F2F2F;
   --text: #FFFFFF;
   --text-secondary: #A3A3A3;
-  --border: #2F2F2F;
+
+  /* Variables Institucionales (Provisionales en gama de rojos) */
+  --brand-primary: #dc2626; /* Rojo principal */
+  --brand-secondary: #fca5a5; /* Rojo secundario (acentos/ediciones) */
+  --brand-surface: #450a0a; /* Rojo oscuro para fondos sutiles */
+  
+  /* Alias de compatibilidad (Aplica color institucional globalmente) */
+  --primary: var(--brand-primary);
 }
 
 body {

@@ -13,6 +13,11 @@ module.exports = {
         text: "var(--text)",
         muted: "var(--text-secondary)",
         border: "var(--border)",
+        brand: {
+          primary: "var(--brand-primary)",
+          secondary: "var(--brand-secondary)",
+          surface: "var(--brand-surface)",
+        }
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

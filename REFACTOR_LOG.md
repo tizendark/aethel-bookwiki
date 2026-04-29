@@ -42,3 +42,11 @@ Se han estandarizado los tipos en `src/types/index.ts` para eliminar la ambigüe
 
 ---
 *Este log marca el fin de la fase de desacoplamiento de infraestructura. El sistema es ahora agnóstico a la persistencia y puede alternar entre Firebase y una API REST mediante configuración.*
+
+## 6. Nuevas Funcionalidades de Frontend (UI/UX)
+
+-   [x] **Infraestructura de Marca (Temas CSS)**: Se implementó un sistema de variables CSS (`--brand-*`) en `globals.css` y se mapeó a Tailwind para permitir cambios dinámicos de color institucional (como la paleta de la Universidad de la Costa).
+-   [x] **Interacciones Sociales (Likes)**: 
+    -   Se extendió el modelo `Book` para soportar un contador de `likesCount`.
+    -   Se implementaron los métodos `toggleLike` y `hasUserLiked` en las capas de servicio (usando transacciones atómicas en Firebase).
+    -   Se creó un botón flotante interactivo (con animaciones de Framer Motion) en el visor de libros (`book/[id]/page.tsx`) con un sistema de actualización optimista (Optimistic UI) para una respuesta instantánea.

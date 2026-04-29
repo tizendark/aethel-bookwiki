@@ -81,4 +81,23 @@ export class ApiBookService implements IBookService {
       method: 'POST',
     });
   }
+
+  // === Social Interactions ===
+
+  async hasUserLiked(bookId: string, userId: string): Promise<boolean> {
+    try {
+      const result = await this.fetchApi<{ liked: boolean }>(`/books/${bookId}/likes/${userId}`);
+      return result.liked;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async toggleLike(bookId: string, userId: string): Promise<boolean> {
+    const result = await this.fetchApi<{ liked: boolean }>(`/books/${bookId}/like`, {
+      method: 'POST',
+      body: JSON.stringify({ userId }),
+    });
+    return result.liked;
+  }
 }

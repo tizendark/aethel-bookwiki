@@ -20,6 +20,7 @@ export interface Book {
   status: BookStatus;
   createdAt: string;
   updatedAt?: string;
+  likesCount?: number;
 }
 
 // === DTOs (Data Transfer Objects) ===

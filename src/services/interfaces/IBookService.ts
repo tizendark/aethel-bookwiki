@@ -16,4 +16,8 @@ export interface IBookService {
   // === Moderation ===
   approveBook(pendingBookId: string): Promise<string>;
   rejectBook(pendingBookId: string): Promise<void>;
+
+  // === Social Interactions ===
+  toggleLike(bookId: string, userId: string): Promise<boolean>;
+  hasUserLiked(bookId: string, userId: string): Promise<boolean>;
 }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { authService, bookService } from "@/services";
 import { Book } from "@/types";
 import Link from "next/link";
-import { BookOpen, Edit3, Loader2, ArrowLeft, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { BookOpen, Edit3, Loader2, ArrowLeft, ChevronLeft, ChevronRight, Trash2, Heart } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n, getCategoryTranslation } from "@/contexts/I18nContext";
@@ -17,7 +17,12 @@ export default function BookViewPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   
-  const { isModerator } = useAuth();
+  // Like states
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [isLiking, setIsLiking] = useState(false);
+  
+  const { user, isModerator } = useAuth();
   
   const router = useRouter();
   const { t } = useI18n();
@@ -28,6 +33,14 @@ export default function BookViewPage() {
         setIsLoading(true);
         const data = await bookService.getBookById(id);
         setBook(data);
+        
+        if (data) {
+          setLikesCount(data.likesCount || 0);
+          if (user) {
+            const liked = await bookService.hasUserLiked(id, user.uid);
+            setIsLiked(liked);
+          }
+        }
       } catch (err) {
         console.error("Error fetching book:", err);
       } finally {
@@ -38,7 +51,7 @@ export default function BookViewPage() {
     if (id) {
       fetchBook();
     }
-  }, [id]);
+  }, [id, user]);
 
   if (isLoading) {
     return (
@@ -95,6 +108,41 @@ export default function BookViewPage() {
     }
   };
 
+  const handleLike = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    if (isLiking) return;
+    setIsLiking(true);
+
+    // Optimistic UI update
+    const prevLiked = isLiked;
+    const prevCount = likesCount;
+    
+    setIsLiked(!prevLiked);
+    setLikesCount(prev => prevLiked ? Math.max(0, prev - 1) : prev + 1);
+
+    try {
+      const serverLikedState = await bookService.toggleLike(book.id, user.uid);
+      
+      // Resync with server if optimistic update was wrong (rare)
+      if (serverLikedState !== !prevLiked) {
+         setIsLiked(serverLikedState);
+         // En un entorno real, haríamos un fetch silencioso del contador exacto.
+         // Por ahora, confiamos en la transacción del servidor para el eventual consistence.
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      // Revert optimistic update
+      setIsLiked(prevLiked);
+      setLikesCount(prevCount);
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background py-32 px-4 sm:px-6 lg:px-8 font-sans antialiased text-text selection:bg-primary/30 selection:text-white">
       <article className="max-w-4xl mx-auto">
@@ -117,13 +165,33 @@ export default function BookViewPage() {
         </header>
 
         {/* Cover Image Parallax-ish Wrapper */}
-        <div className="relative w-full aspect-video md:aspect-[2.5/1] rounded-3xl overflow-hidden mb-16 shadow-editorial border border-white/5">
+        <div className="relative w-full aspect-video md:aspect-[2.5/1] rounded-3xl overflow-hidden mb-16 shadow-editorial border border-white/5 group">
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 opacity-80" />
           <img 
             src={book.coverUrl} 
             alt={book.title}
-            className="w-full h-full object-cover object-center transform transition-transform duration-[2s] hover:scale-105"
+            className="w-full h-full object-cover object-center transform transition-transform duration-[2s] group-hover:scale-105"
           />
+          
+          {/* Floating Like Button on Cover */}
+          <div className="absolute bottom-6 right-6 z-20">
+            <button
+              onClick={handleLike}
+              disabled={isLiking}
+              className={`flex items-center gap-3 px-5 py-3 rounded-full backdrop-blur-md border transition-all duration-300 shadow-soft
+                ${isLiked 
+                  ? 'bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500/30' 
+                  : 'bg-black/40 border-white/10 text-white hover:bg-black/60 hover:border-white/20'}`}
+            >
+              <motion.div
+                 animate={{ scale: isLiked ? [1, 1.5, 1] : 1 }}
+                 transition={{ duration: 0.3 }}
+              >
+                <Heart size={20} className={isLiked ? 'fill-current' : ''} />
+              </motion.div>
+              <span className="text-sm font-bold tabular-nums tracking-wider">{likesCount}</span>
+            </button>
+          </div>
         </div>
 
         {/* Synopsis Area */}

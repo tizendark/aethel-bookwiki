@@ -9,6 +9,7 @@ import {
   updateDoc,
   query,
   where,
+  runTransaction,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Book, NewBookInput } from '@/types';
@@ -39,6 +40,7 @@ function snapshotToBook(id: string, data: Record<string, unknown>): Book {
     status: (data.status as Book['status']) || 'pending',
     createdAt: (data.createdAt as string) || new Date().toISOString(),
     updatedAt: (data.updatedAt as string) || undefined,
+    likesCount: typeof data.likesCount === 'number' ? data.likesCount : 0,
   };
 }
 
@@ -185,6 +187,54 @@ export class FirebaseBookService implements IBookService {
       await deleteDoc(pendingDocRef);
     } catch (error) {
       console.error(`[BookService] Error rejecting book ${pendingBookId}:`, error);
+      throw error;
+    }
+  }
+
+  // === Social Interactions ===
+
+  async hasUserLiked(bookId: string, userId: string): Promise<boolean> {
+    try {
+      const likeRef = doc(db, `books/${bookId}/likes`, userId);
+      const snap = await getDoc(likeRef);
+      return snap.exists();
+    } catch (error) {
+      console.error(`[BookService] Error checking like for book ${bookId} by user ${userId}:`, error);
+      return false;
+    }
+  }
+
+  async toggleLike(bookId: string, userId: string): Promise<boolean> {
+    try {
+      const bookRef = doc(db, 'books', bookId);
+      const likeRef = doc(db, `books/${bookId}/likes`, userId);
+      let isLiked = false;
+
+      await runTransaction(db, async (transaction) => {
+        const bookDoc = await transaction.get(bookRef);
+        if (!bookDoc.exists()) {
+          throw new Error('El libro no existe');
+        }
+
+        const likeDoc = await transaction.get(likeRef);
+        const currentLikes = bookDoc.data().likesCount || 0;
+
+        if (likeDoc.exists()) {
+          // Ya le dio like, quitarlo
+          transaction.delete(likeRef);
+          transaction.update(bookRef, { likesCount: Math.max(0, currentLikes - 1) });
+          isLiked = false;
+        } else {
+          // No le ha dado like, añadirlo
+          transaction.set(likeRef, { createdAt: new Date().toISOString() });
+          transaction.update(bookRef, { likesCount: currentLikes + 1 });
+          isLiked = true;
+        }
+      });
+
+      return isLiked;
+    } catch (error) {
+      console.error(`[BookService] Error toggling like for book ${bookId}:`, error);
       throw error;
     }
   }

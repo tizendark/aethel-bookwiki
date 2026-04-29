@@ -156,14 +156,14 @@ export default function MyWorksPage() {
 
                   {/* Local Edit Drafts */}
                   {localEditDrafts.map(draft => (
-                    <div key={draft.bookId} className="bg-surface rounded-2xl border border-cyan-500/30 p-6 flex flex-col relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl -mr-10 -mt-10" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 mb-3 block">{t("myWorks.localEditDraft")}</span>
+                    <div key={draft.bookId} className="bg-surface rounded-2xl border border-brand-secondary/30 p-6 flex flex-col relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-brand-surface rounded-full blur-3xl -mr-10 -mt-10" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-brand-secondary mb-3 block">{t("myWorks.localEditDraft")}</span>
                       <h3 className="text-2xl font-serif font-bold text-white mb-2 line-clamp-1">{draft.title || t("myWorks.editInProgress")}</h3>
                       <p className="text-sm text-muted line-clamp-2 mb-6 flex-grow">
                         {draft.synopsis || t("myWorks.pendingReview")}
                       </p>
-                      <Link href={`/book/${draft.bookId}/edit`} className="inline-flex items-center gap-2 px-5 py-2.5 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500 hover:text-white text-xs font-black uppercase tracking-wider rounded-full transition-all w-fit">
+                      <Link href={`/book/${draft.bookId}/edit`} className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-secondary/20 text-brand-secondary hover:bg-brand-secondary hover:text-background text-xs font-black uppercase tracking-wider rounded-full transition-all w-fit">
                         {t("myWorks.continueEdit")} <ArrowRight size={14} />
                       </Link>
                     </div>

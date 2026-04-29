@@ -332,10 +332,10 @@ export default function ModerationPage() {
                       <div className="p-6 md:p-8 flex-grow flex flex-col">
                         <div className="flex justify-between items-start mb-4">
                           <div>
-                            <span className="hidden lg:inline-block px-3 py-1 bg-cyan-500/10 rounded-full text-[10px] font-black uppercase tracking-wider text-cyan-400 border border-cyan-500/20 mb-3">
+                            <span className="hidden lg:inline-block px-3 py-1 bg-brand-surface rounded-full text-[10px] font-black uppercase tracking-wider text-brand-secondary border border-brand-secondary/20 mb-3">
                               {getCategoryTranslation(edit.proposedCategory, t)}
                             </span>
-                            <h3 className="text-2xl font-serif font-bold group-hover:text-cyan-400 transition-colors">
+                            <h3 className="text-2xl font-serif font-bold group-hover:text-brand-secondary transition-colors">
                               {edit.proposedTitle}
                             </h3>
                             <div className="text-xs text-muted mt-2 flex items-center gap-2">
@@ -349,7 +349,7 @@ export default function ModerationPage() {
                         </div>
                         <div className="flex-grow mt-4 bg-background p-4 rounded-xl border border-border/50">
                           <div 
-                            className="text-muted leading-relaxed font-serif text-sm line-clamp-4 prose prose-invert prose-sm prose-p:my-1 prose-headings:my-2 prose-a:text-cyan-400"
+                            className="text-muted leading-relaxed font-serif text-sm line-clamp-4 prose prose-invert prose-sm prose-p:my-1 prose-headings:my-2 prose-a:text-brand-secondary"
                             dangerouslySetInnerHTML={{
                               __html: (edit.proposedSynopsis || (Array.isArray(edit.proposedContent) ? edit.proposedContent[0] : edit.proposedContent)).replace(/\n/g, '<br />')
                             }}
@@ -358,7 +358,7 @@ export default function ModerationPage() {
                         <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row justify-end gap-4">
                           <button
                             onClick={() => openPreview(edit)}
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-cyan-500/20 hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all font-black text-xs uppercase tracking-widest text-cyan-400 sm:mr-auto"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-brand-secondary/20 hover:bg-brand-surface hover:border-brand-secondary/50 transition-all font-black text-xs uppercase tracking-widest text-brand-secondary sm:mr-auto"
                           >
                             <Maximize2 size={16} /> {t("moderation.inspectEdit")}
                           </button>
@@ -372,7 +372,7 @@ export default function ModerationPage() {
                           <button
                             onClick={() => handleApproveEdit(edit)}
                             disabled={processingId !== null}
-                            className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-cyan-500 text-black hover:bg-cyan-400 transition-all shadow-editorial font-black text-xs uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-brand-secondary text-background hover:bg-brand-secondary/80 transition-all shadow-editorial font-black text-xs uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {processingId === edit.id ? (
                               <><Loader2 className="w-4 h-4 animate-spin" /> {t("moderation.processing")}</>
